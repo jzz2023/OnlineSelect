@@ -1,0 +1,92 @@
+Table: course
+----------+--------------+------+-----+---------+---------
+ Field    | Type         | Null | Key | Default | Remarks 
+----------+--------------+------+-----+---------+---------
+ id       | INT(10)      | NO   | PRI |         |         
+ cid      | VARCHAR(100) | YES  |     |         |         
+ cname    | VARCHAR(200) | YES  |     |         |         
+ capacity | VARCHAR(200) | YES  |     |         |         
+ period   | VARCHAR(200) | YES  |     |         |         
+ teacher  | VARCHAR(200) | YES  |     |         |         
+ ctime    | VARCHAR(200) | YES  |     |         |         
+ cplace   | VARCHAR(200) | YES  |     |         |         
+ stuid    | VARCHAR(200) | YES  |     |         |         
+----------+--------------+------+-----+---------+---------
+
+Table: lesson
+-------------+--------------+------+-----+---------+---------
+ Field       | Type         | Null | Key | Default | Remarks 
+-------------+--------------+------+-----+---------+---------
+ id          | VARCHAR(30)  | NO   | PRI |         |         
+ lessonname  | VARCHAR(50)  | YES  |     |         |         
+ capacity    | VARCHAR(100) | YES  |     |         |         
+ period      | VARCHAR(50)  | YES  |     |         |         
+ lessontime  | VARCHAR(255) | YES  |     |         |         
+ teacher     | VARCHAR(150) | YES  |     |         |         
+ lessonplace | VARCHAR(255) | YES  |     |         |         
+ userid      | VARCHAR(200) | YES  |     |         |         
+ stuid       | VARCHAR(100) | YES  |     |         |         
+-------------+--------------+------+-----+---------+---------
+
+Table: material
+-----------+-------------+------+-----+---------+---------
+ Field     | Type        | Null | Key | Default | Remarks 
+-----------+-------------+------+-----+---------+---------
+ m_id      | INT(10)     | NO   | PRI |         |         
+ m_name    | VARCHAR(50) | YES  |     |         |         
+ m_price   | INT(10)     | YES  |     |         |         
+ m_isbn    | VARCHAR(50) | YES  |     |         |         
+ m_author  | VARCHAR(50) | YES  |     |         |         
+ m_press   | VARCHAR(50) | YES  |     |         |         
+ m_remarks | VARCHAR(60) | YES  |     |         |         
+-----------+-------------+------+-----+---------+---------
+
+Table: onlineuser
+----------+--------------+------+-----+---------+---------
+ Field    | Type         | Null | Key | Default | Remarks 
+----------+--------------+------+-----+---------+---------
+ id       | VARCHAR(200) | NO   | PRI |         |         
+ pwd      | VARCHAR(200) | YES  |     |         |         
+ name     | VARCHAR(200) | YES  |     |         |         
+ sex      | VARCHAR(20)  | YES  |     |         |         
+ age      | INT(10)      | YES  |     |         |         
+ identity | VARCHAR(200) | YES  |     |         |         
+ phone    | VARCHAR(30)  | YES  |     |         |         
+ college  | VARCHAR(200) | YES  |     |         |         
+----------+--------------+------+-----+---------+---------
+
+Table: orderlist
+-----------+--------------+------+-----+---------+---------
+ Field     | Type         | Null | Key | Default | Remarks 
+-----------+--------------+------+-----+---------+---------
+ o_id      | INT(10)      | NO   | PRI |         |         
+ u_name    | VARCHAR(50)  | YES  |     |         |         
+ m_name    | VARCHAR(50)  | YES  |     |         |         
+ o_price   | INT(10)      | YES  |     |         |         
+ o_date    | VARCHAR(50)  | YES  |     |         |         
+ o_status  | VARCHAR(200) | YES  |     |         |         
+ o_address | VARCHAR(200) | YES  |     |         |         
+-----------+--------------+------+-----+---------+---------
+
+Table: tb_count
+-------+-------------+------+-----+---------+---------
+ Field | Type        | Null | Key | Default | Remarks 
+-------+-------------+------+-----+---------+---------
+ id    | INT(10)     | NO   | PRI |         |         
+ name  | VARCHAR(40) | YES  |     |         |         
+ money | DOUBLE(22)  | YES  |     |         |         
+-------+-------------+------+-----+---------+---------
+
+Table: user
+------------+-------------+------+-----+---------+---------
+ Field      | Type        | Null | Key | Default | Remarks 
+------------+-------------+------+-----+---------+---------
+ id         | INT(10)     | NO   | PRI |         |         
+ u_name     | VARCHAR(50) | YES  |     |         |         
+ u_password | VARCHAR(50) | YES  |     |         |         
+ u_sex      | VARCHAR(2)  | YES  |     |         |         
+ u_birthday | VARCHAR(50) | YES  |     |         |         
+ u_phone    | VARCHAR(30) | YES  |     |         |         
+ u_identify | VARCHAR(20) | YES  |     |         |         
+------------+-------------+------+-----+---------+---------
+

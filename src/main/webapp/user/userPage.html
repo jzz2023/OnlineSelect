@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生主页</title>
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- import Vue before Element -->
+    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <!-- import JavaScript -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+
+        .el-aside {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-container style="height: 650px; border: 1px solid #eee">
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+            <el-menu :default-openeds="['1', '2']">
+                <el-submenu index="1">
+                    <template slot="title"><i class="el-icon-message"></i>个人信息</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="1-1" @click="getPerson">查看个人信息</el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+                <el-submenu index="2">
+                    <template slot="title"><i class="el-icon-menu"></i>选课信息</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="2-1" @click="selectCourse">进行选课</el-menu-item>
+                        <el-menu-item index="2-2" @click="dropCourse">进行退课</el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+            </el-menu>
+        </el-aside>
+
+        <el-container>
+            <el-header style="text-align: right; font-size: 12px">
+                <el-dropdown>
+                    <i class="el-icon-setting" style="margin-right: 15px"></i>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item><el-button type="text" @click="dialogVisible = true">修改密码</el-button></el-dropdown-item>
+                        <el-dropdown-item><el-button type="text" @click="exit">退出系统</el-button></el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+                <span>我</span>
+            </el-header>
+            <el-main>
+                <!--个人信息-->
+                <el-form ref="form"
+                         v-show="person"
+                         :model="form" label-width="80px">
+                    <el-form-item label="用户id">
+                        <el-input v-model="form.id" readonly></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="姓名">
+                        <el-input v-model="form.name" readonly></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="性别">
+                        <el-input v-model="form.sex" readonly></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="年龄">
+                        <el-input v-model="form.age" readonly></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="身份">
+                        <el-input v-model="form.identity" readonly></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号">
+                        <el-input v-model="form.phone" readonly></el-input>
+                    </el-form-item>
+                    <el-form-item label="学院">
+                        <el-input v-model="form.college" readonly></el-input>
+                    </el-form-item>
+                </el-form>
+
+                <!--修改密码弹框-->
+                <el-dialog
+                        title="密码修改"
+                        :visible.sync="dialogVisible"
+                        width="30%">
+                    <el-form ref="form" :model="form" label-width="80px">
+                        <el-form-item label="用户id">
+                            <el-input v-model="form.id"></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="新密码">
+                            <el-input type="password" v-model="form.pwd"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                    <el-button @click="dialogVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="update">确 定</el-button>
+                    </span>
+                </el-dialog>
+
+            <!--    选课信息-->
+                <div v-show="lessonShow">
+                        <el-form :inline="true" :model="formInline" class="demo-form-inline">
+                            <el-form-item label="课程">
+                                <el-input v-model="formInline.lessonname" placeholder="课程"></el-input>
+                            </el-form-item>
+                            <el-form-item label="课程容量">
+                                <el-input v-model="formInline.capacity" placeholder="课程容量"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="searchCondition">查询</el-button>
+                            </el-form-item>
+                        </el-form>
+                    <el-table
+                            :data="lesson"
+                            border
+                            style="width: 100%">
+                        <el-table-column
+                                prop="id"
+                                label="课程编号">
+                        </el-table-column>
+                        <el-table-column
+                                prop="lessonname"
+                                label="课程名">
+                        </el-table-column>
+                        <el-table-column
+                                prop="capacity"
+                                label="剩余课程容量">
+                        </el-table-column>
+                        <el-table-column
+                                prop="period"
+                                label="课时">
+                        </el-table-column>
+                        <el-table-column
+                                prop="lessontime"
+                                label="上课时间">
+                        </el-table-column>
+                        <el-table-column
+                                prop="teacher"
+                                label="授课老师">
+                        </el-table-column>
+                        <el-table-column
+                                prop="lessonplace"
+                                label="上课地点">
+                        </el-table-column>
+                        <el-table-column
+                                label="操作"
+                                width="160px">
+                            <template v-slot="scope">
+                            <el-button type="primary" size="medium" @click="takeCourse(scope.row)">选课</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+
+                <!--    退课信息-->
+                <div v-show="droplesson">
+                    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+                        <el-form-item label="课程">
+                            <el-input v-model="formInline.lessonname" placeholder="课程"></el-input>
+                        </el-form-item>
+                        <el-form-item label="课程容量">
+                            <el-input v-model="formInline.capacity" placeholder="课程容量"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="dsearchCondition">查询</el-button>
+                        </el-form-item>
+                    </el-form>
+                    <el-table
+                            :data="dcourse"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                prop="cid"
+                                label="课程编号">
+                        </el-table-column>
+                        <el-table-column
+                                prop="cname"
+                                label="课程名">
+                        </el-table-column>
+                        <el-table-column
+                                prop="capacity"
+                                label="剩余课程容量">
+                        </el-table-column>
+                        <el-table-column
+                                prop="period"
+                                label="课时">
+                        </el-table-column>
+                        <el-table-column
+                                prop="ctime"
+                                label="上课时间">
+                        </el-table-column>
+                        <el-table-column
+                                prop="teacher"
+                                label="授课老师">
+                        </el-table-column>
+                        <el-table-column
+                                prop="cplace"
+                                label="上课地点">
+                        </el-table-column>
+                        <el-table-column
+                                label="操作"
+                                width="160px">
+                            <template v-slot="scope">
+                            <el-button type="danger" size="medium" @click="outCourse(scope.row)">退课</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+</body>
+<script>
+    new Vue({
+        el: "#app",
+        created() {
+            this.getStudent();
+        },
+        methods: {
+            getStudent() {
+                let _this = this;
+                axios({
+                    method: "get",
+                    url: "../user/getStudent"
+                }).then(function (res) {
+                    _this.form = res.data[0];
+                    _this.lesson.stuid=res.data[0].stuid
+                })
+            },
+
+            //密码修改
+            update(){
+                let _this=this;
+                axios({
+                    method: "post",
+                    url:"../user/updatePwd",
+                    data:_this.form
+                }).then(function (res) {
+                    if(res.data=="success"){
+                        _this.$message({
+                            message: '密码修改成功',
+                            type: 'success'
+                        });
+                        _this.dialogVisible=false;
+                    }else {
+                        _this.$message.error('密码修改失败');
+                    }
+                })
+            },
+
+        //    选课信息
+            selectCourse(){
+                this.lessonShow=true;
+                this.droplesson=false;
+                this.person=false;
+                let _this=this;
+                axios({
+                    method:"get",
+                    url:"../lesson/getAllLesson"
+                }).then(function (res) {
+                    _this.lesson=res.data.data
+                })
+            },
+
+            //进行选课
+            takeCourse(val){
+                console.log(val)
+                let _this=this;
+                axios({
+                    method:"post",
+                    url:"../lesson/getLesson",
+                    data:{
+                        "cid":val.id,
+                        "cname":val.lessonname,
+                        "capacity":val.capacity,
+                        "period":val.period,
+                        "teacher":val.teacher,
+                        "ctime":val.lessontime,
+                        "cplace":val.lessonplace,
+                        "stuid":val.stuid
+                    }
+                }).then(function (resp) {
+                    if(resp.data=="success"){
+                        _this.$message.success("选课成功")
+                    }else if(resp.data=="error"){
+                        _this.$message.error("已选择该课程，不能重复选择");
+                    }else if(resp.data=="warn"){
+                        _this.$message({
+                            message: '该课程已满员，请选择其他课程',
+                            type: 'warning'
+                        });
+                    }
+                })
+            },
+
+            //退课信息
+            dropCourse(){
+                this.lessonShow=false;
+                this.droplesson=true;
+                this.person=false;
+                let _this=this;
+                axios({
+                    method:"get",
+                    url:"../lesson/getStuId"
+                }).then(function (resp) {
+                    _this.dcourse=resp.data
+                })
+            },
+
+            //进行退课
+            outCourse(val){
+                console.log(val)
+                this.$confirm('此操作将删除该课程, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    let _this=this;
+                    axios({
+                        method:"post",
+                        url:"../lesson/dropLesson",
+                        data:{
+                            "id":val.id,
+                            "cid":val.cid,
+                            "capacity":val.capacity,
+                            "stuid":val.stuid
+                        }
+                    }).then(function (resp) {
+                        if(resp.data=="success"){
+                            _this.$message.success("退课成功");
+                            _this.dropCourse();
+                        }else {
+                            _this.$message.error("退课失败");
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消退课'
+                    });
+                });
+
+            },
+
+            searchCondition(){
+                let _this=this;
+                axios({
+                    method:"post",
+                    url:"../lesson/search",
+                    data:{
+                        "lessonname":_this.formInline.lessonname,
+                        "capacity":_this.formInline.capacity
+                    }
+                }).then(function (resp) {
+                    _this.lesson=resp.data;
+                })
+            },
+
+            dsearchCondition(){
+                let _this=this;
+                axios({
+                    method:"post",
+                    url:"../lesson/dsearch",
+                    data:{
+                        "cname":_this.formInline.lessonname,
+                        "capacity":_this.formInline.capacity
+                    }
+                }).then(function (resp) {
+                    _this.dcourse=resp.data;
+                })
+            },
+
+            //查看个人信息
+            getPerson(){
+                this.person=true;
+                this.droplesson=false;
+                this.lessonShow=false;
+            },
+
+        //    退出系统
+            exit(){
+              location.href="http://localhost:8080"
+            }
+
+        },
+        data() {
+            return {
+                form: {
+                    id: '',
+                    pwd:'',
+                    name: '',
+                    sex: '',
+                    age: '',
+                    identity: '',
+                    phone: '',
+                    college: ''
+                },
+                formInline: {
+                    lessonname: '',
+                    capacity: ''
+                },
+                dialogVisible: false,
+                lessonShow:false,
+                droplesson:false,
+                person:true,
+                lesson: [{
+                    id: 'S102',
+                    lessonname: '软件构造',
+                    capacity: '80',
+                    period:'32',
+                    lessontime:'周三下午',
+                    teacher:'啦啦啦',
+                    lessonplace:'基505',
+                    userid:'2',
+                    stuid:'0'
+                }],
+                dcourse: [{
+                    id:'',
+                    cid: 'S102',
+                    cname: '软件构造',
+                    capacity: '80',
+                    period:'32',
+                    ctime:'周三下午',
+                    teacher:'啦啦啦',
+                    cplace:'基505',
+                    stuid:'0'
+                }],
+                course:{
+                    id: 'S102',
+                    lessonname: '软件构造',
+                    capacity: '80',
+                    period:'32',
+                    lessontime:'周三下午',
+                    teacher:'啦啦啦',
+                    lessonplace:'基505',
+                    stuid:'0'
+                }
+            }
+        }
+    })
+</script>
+</html>
